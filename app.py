@@ -1,29 +1,32 @@
-from fastapi import FastAPI, Response, status
+"""Aplicação para o módulo de extensão DevOps"""
+
 from datetime import datetime
+
+from fastapi import FastAPI, Response, status
 from requests import request
 
 APP = FastAPI()
 
-@APP.get("/")
-async def index():
-    return {"mensagem": "Olá, mundo!"}
-
-
-#ESTRUTURA DA TAREFA
-"""
-{
-    "id"            -> int,
-    "titulo"        -> str,
-    "descricao"     -> "str",
-    "concluida"     -> bool,
-    "criado_em"     -> datetime
-    "concluida_em"  -> datetime | None
-}
-"""
+# ESTRUTURA DA TAREFA
+# {
+#     "id"            -> int,
+#     "titulo"        -> str,
+#     "descricao"     -> str,
+#     "concluida"     -> bool,
+#     "criado_em"     -> datetime,
+#     "concluida_em"  -> datetime | None
+# }
 TAREFAS = []
 
 
+@APP.get("/")
+async def index():
+    """Rota inicial da API."""
+    return {"mensagem": "Olá, mundo!"}
+
+
 def criar_tarefa(titulo, descricao):
+    """Cria um dicionário de tarefa com os dados informados."""
     return {
         "id": len(TAREFAS),
         "titulo": titulo,
@@ -32,35 +35,46 @@ def criar_tarefa(titulo, descricao):
         "criado_em": datetime.now()
     }
 
-def encontrar_tarefa(id: int) -> dict | None:
-    global TAREFAS
+
+def encontrar_tarefa(tarefa_id: int) -> dict | None:
+    """Retorna a tarefa com o id informado, ou None se não existir."""
     for tarefa in TAREFAS:
-        if id == int(tarefa["id"]):
+        if tarefa_id == int(tarefa["id"]):
             return tarefa
+    return None
 
 
 def notificar(mensagem: str):
-    resp = request("POST", f"http://localhost:8000/enviar?mensagem={mensagem}")
+    """Envia uma notificação para o serviço de mensagens."""
+    resp = request(
+        "POST",
+        "http://localhost:8000/enviar",
+        params={"mensagem": mensagem},
+        timeout=5,
+    )
     print("Mensagem enviada com sucesso: " + resp.text)
 
 
 @APP.get("/tarefas")
 async def tarefas():
+    """Lista todas as tarefas."""
     return TAREFAS
 
 
 @APP.post("/tarefas")
 async def post_tarefas(titulo: str, descricao: str):
+    """Cria uma nova tarefa."""
     tarefa_nova = criar_tarefa(titulo, descricao)
     TAREFAS.append(tarefa_nova)
 
-    notificar(f"Taarefa {tarefa_nova["id"]} criada com sucesso")
+    notificar(f"Tarefa {tarefa_nova['id']} criada com sucesso")
     return {"message": "ok"}
 
 
-@APP.get("/tarefas/{id}")
-async def tarefa_especifica(id: int):
-    tarefa = encontrar_tarefa(id)
+@APP.get("/tarefas/{tarefa_id}")
+async def tarefa_especifica(tarefa_id: int):
+    """Retorna uma tarefa específica."""
+    tarefa = encontrar_tarefa(tarefa_id)
 
     if not tarefa:
         return {"message": "Tarefa não existente"}
@@ -68,28 +82,30 @@ async def tarefa_especifica(id: int):
     return tarefa
 
 
-@APP.put("/tarefas/{id}")
-async def concluir_tarefa(id: int):
-    tarefa = encontrar_tarefa(id)
+@APP.put("/tarefas/{tarefa_id}")
+async def concluir_tarefa(tarefa_id: int):
+    """Marca uma tarefa como concluída."""
+    tarefa = encontrar_tarefa(tarefa_id)
 
     if not tarefa:
         return {"message": "Tarefa não existente"}
-    elif tarefa["concluida"] == True:
+    if tarefa["concluida"]:
         return {"message": "Atarefa já está concluida"}
 
     tarefa["concluida"] = True
     tarefa["concluida_em"] = datetime.now()
-    notificar(f"Tarefa {tarefa["id"]} concluida com sucesso")
+    notificar(f"Tarefa {tarefa['id']} concluida com sucesso")
     return tarefa
 
 
-@APP.delete("/tarefas/{id}")
-async def apagar_tarefa(id: int):
-    tarefa = encontrar_tarefa(id)
+@APP.delete("/tarefas/{tarefa_id}")
+async def apagar_tarefa(tarefa_id: int):
+    """Apaga uma tarefa."""
+    tarefa = encontrar_tarefa(tarefa_id)
 
     if not tarefa:
         return {"message": "Tarefa não existente"}
 
     TAREFAS.remove(tarefa)
-    notificar(f"Taarefa {tarefa["id"]} apagada com sucesso")
+    notificar(f"Tarefa {tarefa['id']} apagada com sucesso")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
