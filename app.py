@@ -12,15 +12,16 @@ async def index():
 #ESTRUTURA DA TAREFA
 """
 {
-    "id" -> int,
-    "titulo" -> str,
-    "descricao" -> "str",
-    "concluida" -> bool,
-    "criado_em" -> datetime
-    "concluida_em" -> datetime | None
+    "id"            -> int,
+    "titulo"        -> str,
+    "descricao"     -> "str",
+    "concluida"     -> bool,
+    "criado_em"     -> datetime
+    "concluida_em"  -> datetime | None
 }
 """
 TAREFAS = []
+
 
 def criar_tarefa(titulo, descricao):
     return {
@@ -47,22 +48,25 @@ def notificar(mensagem: str):
 async def tarefas():
     return TAREFAS
 
+
 @APP.post("/tarefas")
 async def post_tarefas(titulo: str, descricao: str):
     tarefa_nova = criar_tarefa(titulo, descricao)
     TAREFAS.append(tarefa_nova)
 
-    notificar(f"Taarefa {tarefa_nova["id"]} criada com sucesso")    
+    notificar(f"Taarefa {tarefa_nova["id"]} criada com sucesso")
     return {"message": "ok"}
+
 
 @APP.get("/tarefas/{id}")
 async def tarefa_especifica(id: int):
     tarefa = encontrar_tarefa(id)
 
     if not tarefa:
-        return {"message": "Tarefa não existente"} 
+        return {"message": "Tarefa não existente"}
 
     return tarefa
+
 
 @APP.put("/tarefas/{id}")
 async def concluir_tarefa(id: int):
@@ -72,11 +76,12 @@ async def concluir_tarefa(id: int):
         return {"message": "Tarefa não existente"}
     elif tarefa["concluida"] == True:
         return {"message": "Atarefa já está concluida"}
-    
+
     tarefa["concluida"] = True
     tarefa["concluida_em"] = datetime.now()
-    notificar(f"Tarefa {tarefa["id"]} concluida com sucesso")    
+    notificar(f"Tarefa {tarefa["id"]} concluida com sucesso")
     return tarefa
+
 
 @APP.delete("/tarefas/{id}")
 async def apagar_tarefa(id: int):
@@ -86,5 +91,5 @@ async def apagar_tarefa(id: int):
         return {"message": "Tarefa não existente"}
 
     TAREFAS.remove(tarefa)
-    notificar(f"Taarefa {tarefa["id"]} apagada com sucesso")    
+    notificar(f"Taarefa {tarefa["id"]} apagada com sucesso")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
