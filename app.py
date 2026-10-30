@@ -19,12 +19,6 @@ APP = FastAPI()
 TAREFAS = []
 
 
-@APP.get("/")
-async def index():
-    """Rota inicial da API."""
-    return {"mensagem": "Olá, mundo!"}
-
-
 def criar_tarefa(titulo, descricao):
     """Cria um dicionário de tarefa com os dados informados."""
     return {
@@ -53,6 +47,18 @@ def notificar(mensagem: str):
         timeout=5,
     )
     print("Mensagem enviada com sucesso: " + resp.text)
+
+
+@APP.get("/")
+async def index():
+    """Rota inicial da API."""
+    return {"mensagem": "Olá, mundo!"}
+
+
+@APP.get("/autor")
+async def autor():
+    """Nome do autor do projeto"""
+    return {"message": "Leandro Willian Fraccaroli"}
 
 
 @APP.get("/tarefas")
