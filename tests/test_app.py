@@ -1,8 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 
-import app
-from app import APP
+import app.api as api
+from app.api import APP
 
 CLIENT = TestClient(APP)
 
@@ -10,9 +10,9 @@ CLIENT = TestClient(APP)
 @pytest.fixture(autouse=True)
 def preparar(monkeypatch):
     # Limpa as tarefas antes de cada teste
-    app.TAREFAS.clear()
+    api.TAREFAS.clear()
     # Substitui o notificar por uma função que não faz nada
-    monkeypatch.setattr(app, "notificar", lambda mensagem: None)
+    monkeypatch.setattr(api, "notificar", lambda mensagem: None)
 
 
 def criar_tarefa_teste():

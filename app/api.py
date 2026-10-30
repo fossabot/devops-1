@@ -5,35 +5,25 @@ from datetime import datetime
 from fastapi import FastAPI, Response, status
 from requests import request
 
+from app.modelo import Tarefa
+
 APP = FastAPI()
-
-# ESTRUTURA DA TAREFA
-# {
-#     "id"            -> int,
-#     "titulo"        -> str,
-#     "descricao"     -> str,
-#     "concluida"     -> bool,
-#     "criado_em"     -> datetime,
-#     "concluida_em"  -> datetime | None
-# }
-TAREFAS = []
+TAREFAS: list[Tarefa] = []
 
 
-def criar_tarefa(titulo, descricao):
-    """Cria um dicionário de tarefa com os dados informados."""
-    return {
-        "id": len(TAREFAS),
-        "titulo": titulo,
-        "descricao": descricao,
-        "concluida": False,
-        "criado_em": datetime.now()
-    }
+def criar_tarefa(titulo, descricao: str | None = None) -> Tarefa:
+    """Cria uma tarefa com os dados informados."""
+    return Tarefa(id=len(TAREFAS),
+                  titulo=titulo,
+                  descricao=descricao,
+                  concluida=False,
+                  criado_em=datetime.now())
 
 
-def encontrar_tarefa(tarefa_id: int) -> dict | None:
+def encontrar_tarefa(tarefa_id: int) -> Tarefa | None:
     """Retorna a tarefa com o id informado, ou None se não existir."""
     for tarefa in TAREFAS:
-        if tarefa_id == int(tarefa["id"]):
+        if tarefa_id == tarefa.id:
             return tarefa
     return None
 
@@ -73,7 +63,7 @@ async def post_tarefas(titulo: str, descricao: str):
     tarefa_nova = criar_tarefa(titulo, descricao)
     TAREFAS.append(tarefa_nova)
 
-    notificar(f"Tarefa {tarefa_nova['id']} criada com sucesso")
+    notificar(f"Tarefa {tarefa_nova.id} criada com sucesso")
     return {"message": "ok"}
 
 
@@ -95,12 +85,11 @@ async def concluir_tarefa(tarefa_id: int):
 
     if not tarefa:
         return {"message": "Tarefa não existente"}
-    if tarefa["concluida"]:
+    if tarefa.concluida:
         return {"message": "Atarefa já está concluida"}
 
-    tarefa["concluida"] = True
-    tarefa["concluida_em"] = datetime.now()
-    notificar(f"Tarefa {tarefa['id']} concluida com sucesso")
+    tarefa.finalizar()
+    notificar(f"Tarefa {tarefa.id} concluida com sucesso")
     return tarefa
 
 
@@ -113,5 +102,5 @@ async def apagar_tarefa(tarefa_id: int):
         return {"message": "Tarefa não existente"}
 
     TAREFAS.remove(tarefa)
-    notificar(f"Tarefa {tarefa['id']} apagada com sucesso")
+    notificar(f"Tarefa {tarefa.id} apagada com sucesso")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
