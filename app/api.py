@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import Annotated, List
 import os
+import sys
 
 from fastapi import Depends, FastAPI, Response, status
 from requests import RequestException, request
@@ -19,19 +20,19 @@ DATABASE = os.environ.get("DATABASE")
 
 if DATABASE_USERNAME is None:
     print("DATABASE_USERNAME está faltando")
-    exit(1)
+    sys.exit(1)
 
 if DATABASE_PASSWORD is None:
     print("DATABASE_PASSWORD está faltando")
-    exit(1)
+    sys.exit(1)
 
 if DATABASE_ADDRESS is None:
     print("DATABASE_ADDRESS está faltando")
-    exit(1)
+    sys.exit(1)
 
 if DATABASE is None:
     print("DATABASE está faltando")
-    exit(1)
+    sys.exit(1)
 
 
 ENGINE = create_engine(
