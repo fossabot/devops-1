@@ -39,6 +39,7 @@ ENGINE = create_engine(
     f"mysql+pymysql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_ADDRESS}/{DATABASE}"
 )
 
+
 def criar_sessao():
     """Abre uma sessão com o banco para cada requisição."""
     with Session(ENGINE) as s:
@@ -60,10 +61,12 @@ APP = FastAPI(lifespan=inicializacao)
 
 def criar_tarefa(titulo, descricao: str | None = None) -> Tarefa:
     """Cria uma tarefa com os dados informados."""
-    return Tarefa(titulo=titulo,
-                  descricao=descricao,
-                  concluida=False,
-                  criado_em=datetime.now(timezone.utc))
+    return Tarefa(
+        titulo=titulo,
+        descricao=descricao,
+        concluida=False,
+        criado_em=datetime.now(timezone.utc),
+    )
 
 
 def encontrar_tarefa(sessao: Session, tarefa_id: int) -> Tarefa | None:

@@ -8,6 +8,7 @@ from sqlmodel import Field, SQLModel
 
 class Tarefa(SQLModel, table=True):
     """Representa uma tarefa."""
+
     id: Optional[int] = Field(default=None, primary_key=True)
     titulo: str
     descricao: Optional[str] = None

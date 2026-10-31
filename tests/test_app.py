@@ -33,7 +33,9 @@ def preparar(monkeypatch):
 
 def criar_tarefa_teste():
     """Cria uma tarefa padrão pela API."""
-    return CLIENT.post("/tarefas", params={"titulo": "Estudar", "descricao": "Aprender FastAPI"})
+    return CLIENT.post(
+        "/tarefas", params={"titulo": "Estudar", "descricao": "Aprender FastAPI"}
+    )
 
 
 def test_index():
