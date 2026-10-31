@@ -34,8 +34,9 @@ if DATABASE is None:
     exit(1)
 
 
-ENGINE = create_engine("mysql+pymysql://root:root@localhost:3306/devops")
-
+ENGINE = create_engine(
+    f"mysql+pymysql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_ADDRESS}/{DATABASE}"
+)
 
 def criar_sessao():
     """Abre uma sessão com o banco para cada requisição."""
