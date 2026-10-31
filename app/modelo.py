@@ -1,11 +1,11 @@
 """Modelos da  aplicação de tarefa"""
 
 from typing import Optional
-from datetime import datetime
-from pydantic import BaseModel
+from datetime import datetime, timezone
+from sqlmodel import SQLModel, Field
 
-class Tarefa(BaseModel):
-    id: int
+class Tarefa(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
     titulo: str
     descricao: Optional[str] = None
     concluida: bool  
@@ -15,4 +15,4 @@ class Tarefa(BaseModel):
     def finalizar(self):
         """Finaliza a tarefa"""
         self.concluida = True
-        self.concluida_em = datetime.now()
+        self.concluida_em = datetime.now(timezone.utc)
