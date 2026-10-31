@@ -34,7 +34,7 @@ def preparar(monkeypatch):
 def criar_tarefa_teste():
     """Cria uma tarefa padrão pela API."""
     return CLIENT.post(
-        "/tarefas", params={"titulo": "Estudar", "descricao": "Aprender FastAPI"}
+        "/tarefas", params={"titulo": "Estudar", "descricao": "Aprender DevOps"}
     )
 
 
@@ -68,7 +68,7 @@ def test_post_tarefas():
     tarefas = CLIENT.get("/tarefas").json()
     assert len(tarefas) == 1
     assert tarefas[0]["titulo"] == "Estudar"
-    assert tarefas[0]["descricao"] == "Aprender FastAPI"
+    assert tarefas[0]["descricao"] == "Aprender DevOps"
     assert tarefas[0]["concluida"] is False
 
 
